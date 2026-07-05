@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: sre-demo-alerts
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: sre-demo-app.rules
+      rules:
+        - alert: HighHttp500ErrorRate
+          expr: sum(rate(app_http_requests_total{exported_endpoint="/error"}[1m])) > 0
+          for: 30s
+          labels:
+            severity: warning
+            app: sre-demo-app
+          annotations:
+            summary: "High HTTP 500 error rate detected"
+            description: "The SRE demo app is returning HTTP 500 errors."
